@@ -1,9 +1,8 @@
-import Hero from './Hero'
 
 const Website = () => {
   return (
     <div>
-        <Hero />
+        <h1>Hello World</h1>
     </div>
   )
 }

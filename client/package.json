@@ -13,6 +13,7 @@
     "@headlessui/react": "^2.1.9",
     "@heroicons/react": "^2.1.5",
     "@reduxjs/toolkit": "^2.2.7",
+    "daisyui": "^4.12.14",
     "jwt-decode": "^4.0.0",
     "my-setup": "file:",
     "react": "^18.3.1",

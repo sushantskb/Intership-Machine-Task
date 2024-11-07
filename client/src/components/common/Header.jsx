@@ -7,6 +7,8 @@ const Header = () => {
   useEffect(() => {
     if (location.pathname === "/login") {
       setAuthPage(true);
+    } else {
+      setAuthPage(false);
     }
   }, [location.pathname]);
 

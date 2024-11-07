@@ -14,7 +14,7 @@ export const login = asyncHandler(async (req, res) => {
       res,
     });
   }
-  const user = await User.findOne(username);
+  const user = await User.findOne({username});
   if (!user) {
     return message({
       status: 404,
@@ -23,7 +23,7 @@ export const login = asyncHandler(async (req, res) => {
       res,
     });
   }
-  const isMatch = await bcryptjs.compare(user.password, password);
+  const isMatch = await bcryptjs.compare(password, user.password);
   if (isMatch) {
     const token = await signToken(user._id, "1D");
     return message({
@@ -31,7 +31,7 @@ export const login = asyncHandler(async (req, res) => {
       success: true,
       message: "Logged In",
       res,
-      responseData: token,
+      responseData: { token, userName: user.username },
     });
   } else {
     return message({

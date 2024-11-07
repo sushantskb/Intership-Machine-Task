@@ -1,18 +1,19 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-export const testAPI = createApi({
-  reducerPath: "testAPI",
+export const authAPI = createApi({
+  reducerPath: "authAPI",
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API,
   }),
   endpoints: (builder) => ({
-    test: builder.mutation({
+    login: builder.mutation({
       query: (body) => ({
-        url: "/api/test/jwt",
+        url: "/api/v1/auth/login",
         method: "POST",
         body: body,
       }),
     }),
   }),
 });
-export const { useTestMutation } = testAPI;
+
+export const { useLoginMutation } = authAPI;

@@ -3,7 +3,7 @@ import express from "express";
 import morgan from "morgan";
 import { message } from "./utils/custom/message.js";
 import { dbConfig } from "./utils/dbConfig/dbConfig.js";
-import { testRouter } from "./routes/test.route.js";
+import router from "./routes/index.js";
 dotenv.config();
 
 const port = process.env.PORT || 888;
@@ -17,7 +17,7 @@ app.use(morgan("dev"));
 app.get("/health", (req, res) => {
   return res.send("<h1>App is healthy</h1>");
 });
-app.use("/api/test", testRouter);
+app.use("/", router);
 
 app.listen(port, () => {
   dbConfig();

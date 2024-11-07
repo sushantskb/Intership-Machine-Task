@@ -5,10 +5,10 @@ export const asyncHandler = (asyncFunction) => {
     try {
       await asyncFunction(req, res, next);
     } catch (error) {
-    //   message({
-    //     color: "red",
-    //     message: error,
-    //   });
+      message({
+        color: "red",
+        message: error,
+      });
       message({
         status: 500,
         color: "red",

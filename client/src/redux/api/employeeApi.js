@@ -25,11 +25,30 @@ export const employeeAPI = createApi({
         },
       }),
     }),
+    getEmployeeById: builder.query({
+      query: ({ token, id }) => ({
+        url: `/api/v1/employee/emp?id=${id}`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    }),
     deleteEmployee: builder.mutation({
       query: ({ token, empId }) => ({
         url: "/api/v1/employee/delete",
         method: "POST",
         body: { empId },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    }),
+    editEmployee: builder.mutation({
+      query: ({ token, params, empId }) => ({
+        url: `/api/v1/employee/edit?empId=${empId}`,
+        method: "POST",
+        body: params,
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -42,4 +61,6 @@ export const {
   useCreateEmployeeMutation,
   useGetAllEmployeesQuery,
   useDeleteEmployeeMutation,
+  useEditEmployeeMutation,
+  useGetEmployeeByIdQuery,
 } = employeeAPI;

@@ -37,6 +37,25 @@ export const getAllEmployees = asyncHandler(async (req, res) => {
   });
 });
 
+export const getEmployeeById = asyncHandler(async (req, res) => {
+  const empId = req.query.id;
+  const employee = await Employee.findById(empId);
+  if (!employee) {
+    return message({
+      status: 404,
+      success: false,
+      message: "Invlaid Id or Employee Not Found",
+      res,
+    });
+  }
+  return message({
+    status: 200,
+    success: true,
+    res,
+    responseData: employee,
+  });
+});
+
 export const deleteEmployee = asyncHandler(async (req, res) => {
   const empId = req.body.empId;
   if (!empId) {
@@ -53,6 +72,28 @@ export const deleteEmployee = asyncHandler(async (req, res) => {
     status: 200,
     success: true,
     message: "Deleted",
+    res,
+  });
+});
+
+export const editEmployee = asyncHandler(async (req, res) => {
+  const empId = req.query.empId;
+  console.log(empId);
+
+  const params = req.body;
+  if (!empId || empId === undefined) {
+    return message({
+      status: 404,
+      success: false,
+      message: "Invlaid Id or Employee Not Found",
+      res,
+    });
+  }
+  await Employee.findByIdAndUpdate(empId, params);
+  return message({
+    status: 200,
+    success: true,
+    message: "Edited Employee Data",
     res,
   });
 });

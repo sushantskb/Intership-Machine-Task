@@ -6,7 +6,7 @@ import {
   useDeleteEmployeeMutation,
   useGetAllEmployeesQuery,
 } from "../redux/api/employeeApi";
-import { formatDate } from "../../utils/dateFormater"; // my custom date formatter
+import { formatDate } from "../../utils/dateFormater"; // My custom date formatter
 import toast from "react-hot-toast";
 import Header2 from "../components/common/Header2";
 
@@ -18,6 +18,7 @@ const EmployeeList = () => {
 
   // Fetch all employees data with the token
   const { data: apiData, refetch } = useGetAllEmployeesQuery({ token, page });
+  
 
   const [deleteEmployee] = useDeleteEmployeeMutation();
 
@@ -91,18 +92,12 @@ const EmployeeList = () => {
                 <th className="p-3 text-left border border-gray-300">ID</th>
                 <th className="p-3 text-left border border-gray-300">Name</th>
                 <th className="p-3 text-left border border-gray-300">Email</th>
-                <th className="p-3 text-left border border-gray-300">
-                  Mobile No
-                </th>
-                <th className="p-3 text-left border border-gray-300">
-                  Designation
-                </th>
+                <th className="p-3 text-left border border-gray-300">Mobile No</th>
+                <th className="p-3 text-left border border-gray-300">Designation</th>
                 <th className="p-3 text-left border border-gray-300">Gender</th>
                 <th className="p-3 text-left border border-gray-300">Course</th>
                 <th className="p-3 text-left border border-gray-300">Date</th>
-                <th className="p-3 text-center border border-gray-300">
-                  Actions
-                </th>
+                <th className="p-3 text-center border border-gray-300">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -127,7 +122,11 @@ const EmployeeList = () => {
                   <td className="p-3 text-center space-x-2">
                     <button
                       className="btn btn-xs btn-outline btn-info"
-                      onClick={() => console.log(employee._id)}>
+                      onClick={() =>
+                        navigate("/create-employee", {
+                          state: { empId: employee._id },
+                        })
+                      }>
                       Edit
                     </button>
                     <button

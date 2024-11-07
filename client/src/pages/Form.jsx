@@ -3,26 +3,53 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AiOutlineLoading } from "react-icons/ai";
 import Header2 from "../components/common/Header2";
-import { useCreateEmployeeMutation } from "../redux/api/employeeApi";
+import {
+  useCreateEmployeeMutation,
+  useEditEmployeeMutation,
+  useGetEmployeeByIdQuery,
+} from "../redux/api/employeeApi";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 const Form = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const id = location.state?.empId;
+
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, watch } = useForm();
+  const { register, handleSubmit, watch, setValue } = useForm();
   const file = watch("profileImg");
   const [imageUrl, setImageUrl] = useState(null);
   const { token } = useSelector((state) => state.userReducer);
 
   //api
   const [createEmployee] = useCreateEmployeeMutation();
+  const { data: formData, refetch } = useGetEmployeeByIdQuery({ token, id });
+  const [editEmployee] = useEditEmployeeMutation();
+
+  useEffect(() => {
+    if (id) {
+      refetch();
+    }
+  }, [id, refetch]);
 
   useEffect(() => {
     if (file && file[0]) {
       imageChange(file[0]);
     }
   }, [file]);
+
+  useEffect(() => {
+    if (formData) {
+      setValue("name", formData?.responseData?.name);
+      setValue("email", formData?.responseData?.email);
+      setValue("phone", formData?.responseData?.phone);
+      setValue("designation", formData?.responseData?.designation);
+      setValue("gender", formData?.responseData?.gender);
+      setValue("course[]", formData?.responseData?.course || []);
+      setValue("profileImg", formData?.responseData?.profileImg || null);
+    }
+  }, [formData, setValue]);
 
   const imageChange = async (selectedFile) => {
     setLoading(true);
@@ -54,16 +81,35 @@ const Form = () => {
     console.log("params", params);
 
     try {
-      const { data, error } = await createEmployee({ token, params });
-      if (error) {
-        toast.error(error.data.message);
-      }
-      if (data) {
-        toast.success(data.message);
-        navigate("/employees-list");
+      if (id) {
+        const { data: updateData, error: updateError } = await editEmployee({
+          token,
+          params,
+          empId: id,
+        });
+
+        if (updateError) {
+          toast.error(updateError.data.message);
+        } else if (updateData) {
+          toast.success(updateData.message);
+          navigate("/employees-list");
+        }
+      } else {
+        const { data: createData, error: createError } = await createEmployee({
+          token,
+          params,
+        });
+
+        if (createError) {
+          toast.error(createError.data.message);
+        } else if (createData) {
+          toast.success(createData.message);
+          navigate("/employees-list");
+        }
       }
     } catch (error) {
-      console.log("Error", error);
+      console.log("Error:", error);
+      toast.error("An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -86,7 +132,7 @@ const Form = () => {
                 type="text"
                 placeholder="Enter name"
                 className="input input-bordered w-full"
-                {...register("name")}
+                {...register("name", { required: "Name is required" })}
               />
             </div>
 
@@ -97,7 +143,7 @@ const Form = () => {
                 type="email"
                 placeholder="Enter email"
                 className="input input-bordered w-full"
-                {...register("email")}
+                {...register("email", { required: "Email is required" })}
               />
             </div>
 
@@ -108,7 +154,9 @@ const Form = () => {
                 type="tel"
                 placeholder="Enter mobile number"
                 className="input input-bordered w-full"
-                {...register("phone")}
+                {...register("phone", {
+                  required: "Mobile Number is required",
+                })}
               />
             </div>
 
@@ -117,7 +165,9 @@ const Form = () => {
               <label className="mb-2 text-gray-700">Designation</label>
               <select
                 className="select select-bordered w-full"
-                {...register("designation")}>
+                {...register("designation", {
+                  required: "Designation is required",
+                })}>
                 <option disabled selected>
                   Select designation
                 </option>
@@ -221,7 +271,7 @@ const Form = () => {
                 type="submit"
                 className="btn btn-success w-full md:w-[50%] text-white"
                 disabled={loading}>
-                Submit
+                {formData ? "Edit" : "Submit"}
               </button>
             </div>
           </form>

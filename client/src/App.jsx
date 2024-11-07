@@ -6,10 +6,24 @@ import EmployeeList from "./pages/EmployeeList";
 import Login from "./pages/Auth/Login";
 import { CheckToken } from "./middleware/checkToken";
 import Validtor from "./middleware/Validtor";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { isTokenExpired } from "./middleware/tokenExpiry";
+import { persistor } from "./redux/store";
+import { userNotExist } from "./redux/reducers/userReducer";
 
 export default function App() {
-  const token = CheckToken();
-  console.log("token", token);
+  const checkToken = CheckToken();
+  const dispatch = useDispatch();
+  const { token } = useSelector((state) => state.userReducer);
+  useEffect(() => {
+    const tokenExpired = isTokenExpired(token);
+    if (tokenExpired) {
+      console.log("Token Expired");
+      persistor.purge();
+      dispatch(userNotExist());
+    }
+  }, []);
 
   return (
     <BrowserRouter>
@@ -22,7 +36,7 @@ export default function App() {
           </Route>
           <Route
             path="/login"
-            element={token ? <Navigate to={"/"} /> : <Login />}
+            element={checkToken ? <Navigate to={"/"} /> : <Login />}
           />
         </Route>
       </Routes>

@@ -6,12 +6,14 @@ import { useDispatch } from "react-redux";
 import { userExist } from "../../redux/reducers/userReducer";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassowrd] = useState(false);
   const [login] = useLoginMutation();
   const submitHandler = async (body) => {
     console.log("Body", body);
@@ -33,6 +35,9 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
+  };
+  const handleShowPassword = () => {
+    setShowPassowrd(!showPassword);
   };
   return (
     <div>
@@ -64,12 +69,20 @@ const Login = () => {
                   <label className="label">
                     <span className="label-text">Password</span>
                   </label>
-                  <input
-                    type="password"
-                    placeholder="Enter your password"
-                    className="input input-bordered w-full focus:border-none"
-                    {...register("password")}
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      className="input input-bordered w-full focus:border-none"
+                      {...register("password")}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleShowPassword}
+                      className="absolute top-1/2 right-3 transform -translate-y-1/2 text-xl">
+                      {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
+                    </button>
+                  </div>
                 </div>
 
                 {error && (

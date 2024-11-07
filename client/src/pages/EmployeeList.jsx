@@ -39,7 +39,7 @@ const EmployeeList = () => {
       return (
         employee.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
         employee.email.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        employee._id.toLowerCase().includes(searchKeyword.toLowerCase())
+        employee.id.toLowerCase().includes(searchKeyword.toLowerCase())
       );
     }
   );

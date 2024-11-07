@@ -1,105 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
-
-// Sample employee data
-const employeeData = [
-  {
-    id: 1,
-    name: "Hukum",
-    email: "hcgupta@cstech.in",
-    mobile: "954010044",
-    designation: "HR",
-    gender: "Male",
-    course: "MCA",
-    date: "13-Feb-21",
-  },
-  {
-    id: 2,
-    name: "Manish",
-    email: "manish@cstech.in",
-    mobile: "954010033",
-    designation: "Sales",
-    gender: "Male",
-    course: "BCA",
-    date: "12-Feb-21",
-  },
-  {
-    id: 3,
-    name: "Yash",
-    email: "yash@cstech.in",
-    mobile: "954010022",
-    designation: "Manager",
-    gender: "Male",
-    course: "BSC",
-    date: "11-Feb-21",
-  },
-  {
-    id: 4,
-    name: "Abhishek",
-    email: "abhishek@cstech.in",
-    mobile: "954010033",
-    designation: "HR",
-    gender: "Male",
-    course: "MCA",
-    date: "13-Feb-21",
-  },
-  {
-    id: 5,
-    name: "Ravi",
-    email: "ravi@cstech.in",
-    mobile: "954010055",
-    designation: "Developer",
-    gender: "Male",
-    course: "BCA",
-    date: "10-Feb-21",
-  },
-  {
-    id: 6,
-    name: "Priya",
-    email: "priya@cstech.in",
-    mobile: "954010066",
-    designation: "Designer",
-    gender: "Female",
-    course: "MCA",
-    date: "09-Feb-21",
-  },
-];
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useGetAllEmployeesQuery } from "../redux/api/employeeApi";
+import { formatDate } from "../../utils/dateFormater"; //my custom date formatter
 
 const EmployeeList = () => {
-  const itemsPerPage = 4;
-  const [currentItems, setCurrentItems] = useState(
-    employeeData.slice(0, itemsPerPage)
-  );
-  const [pageCount, setPageCount] = useState(
-    Math.ceil(employeeData.length / itemsPerPage)
-  );
-  const [itemOffset, setItemOffset] = useState(0);
-  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+  const { token } = useSelector((state) => state.userReducer);
+  const [page, setPage] = useState(1);
+  const [searchKeyword, setSearchKeyword] = useState("");
 
-  const handlePageClick = (event) => {
-    const newOffset = (event.selected * itemsPerPage) % employeeData.length;
-    setItemOffset(newOffset);
-    const filteredData = filterData(employeeData, searchTerm);
-    setCurrentItems(filteredData.slice(newOffset, newOffset + itemsPerPage));
+  // Fetch all employees data with the token
+  const { data: apiData, refetch } = useGetAllEmployeesQuery({ token, page });
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
+  const handlePageClick = ({ selected }) => {
+    setPage(selected + 1);
   };
 
   const handleSearchChange = (e) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-    const filteredData = filterData(employeeData, term);
-    setPageCount(Math.ceil(filteredData.length / itemsPerPage));
-    setCurrentItems(filteredData.slice(0, itemsPerPage));
-    setItemOffset(0);
+    setSearchKeyword(e.target.value);
   };
 
-  const filterData = (data, term) => {
-    return data.filter(
-      (employee) =>
-        employee.name.toLowerCase().includes(term.toLowerCase()) ||
-        employee.email.toLowerCase().includes(term.toLowerCase()) ||
-        employee.designation.toLowerCase().includes(term.toLowerCase())
-    );
-  };
+  const filteredEmployess = apiData.responseData?.employees.filter(
+    (employee) => {
+      return (
+        employee.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        employee.email.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        employee._id.toLowerCase().includes(searchKeyword.toLowerCase())
+      );
+    }
+  );
 
   return (
     <div className="container mx-auto p-4">
@@ -107,16 +42,20 @@ const EmployeeList = () => {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Employee List</h1>
         <span className="text-gray-600">
-          Total Count: {filterData(employeeData, searchTerm).length}
+          Total Count: {apiData?.responseData?.employees.length}
         </span>
-        <button className="btn btn-primary">Create Employee</button>
+        <button
+          onClick={() => navigate("/create-employee")}
+          className="btn btn-primary">
+          Create Employee
+        </button>
       </div>
 
       <div className="mb-4">
         <input
           type="text"
           placeholder="Enter search keyword..."
-          value={searchTerm}
+          value={searchKeyword}
           onChange={handleSearchChange}
           className="input input-bordered w-full"
         />
@@ -126,37 +65,51 @@ const EmployeeList = () => {
         <table className="table w-full border-collapse border border-gray-300">
           <thead>
             <tr className="bg-blue-100 text-gray-700">
-              <th className="p-2 border border-gray-300">ID</th>
-              <th className="p-2 border border-gray-300">Name</th>
-              <th className="p-2 border border-gray-300">Email</th>
-              <th className="p-2 border border-gray-300">Mobile No</th>
-              <th className="p-2 border border-gray-300">Designation</th>
-              <th className="p-2 border border-gray-300">Gender</th>
-              <th className="p-2 border border-gray-300">Course</th>
-              <th className="p-2 border border-gray-300">Date</th>
-              <th className="p-2 border border-gray-300">Actions</th>
+              <th className="p-3 text-left border border-gray-300">ID</th>
+              <th className="p-3 text-left border border-gray-300">Name</th>
+              <th className="p-3 text-left border border-gray-300">Email</th>
+              <th className="p-3 text-left border border-gray-300">
+                Mobile No
+              </th>
+              <th className="p-3 text-left border border-gray-300">
+                Designation
+              </th>
+              <th className="p-3 text-left border border-gray-300">Gender</th>
+              <th className="p-3 text-left border border-gray-300">Course</th>
+              <th className="p-3 text-left border border-gray-300">Date</th>
+              <th className="p-3 text-center border border-gray-300">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
-            {currentItems.map((employee) => (
+            {filteredEmployess.map((employee) => (
               <tr
                 key={employee.id}
                 className="text-center border border-gray-300">
-                <td className="p-2">{employee.id}</td>
-                <td className="p-2">{employee.name}</td>
-                <td className="p-2 text-blue-600">
+                <td className="p-3 text-left">{employee._id}</td>
+                <td className="p-3 text-left">{employee.name}</td>
+                <td className="p-3 text-left text-blue-600">
                   <a href={`mailto:${employee.email}`}>{employee.email}</a>
                 </td>
-                <td className="p-2">{employee.mobile}</td>
-                <td className="p-2">{employee.designation}</td>
-                <td className="p-2">{employee.gender}</td>
-                <td className="p-2">{employee.course}</td>
-                <td className="p-2">{employee.date}</td>
-                <td className="p-2 space-x-2">
-                  <button className="btn btn-xs btn-outline btn-info">
+                <td className="p-3 text-left">{employee.phone}</td>
+                <td className="p-3 text-left">{employee.designation}</td>
+                <td className="p-3 text-left">{employee.gender}</td>
+                <td className="p-3 text-left">
+                  {employee?.course?.join(", ")}
+                </td>
+                <td className="p-3 text-left">
+                  {formatDate(employee.createdAt?.split("T")[0])}
+                </td>
+                <td className="p-3 text-center space-x-2">
+                  <button
+                    className="btn btn-xs btn-outline btn-info"
+                    onClick={() => console.log(employee._id)}>
                     Edit
                   </button>
-                  <button className="btn btn-xs btn-outline btn-error">
+                  <button
+                    className="btn btn-xs btn-outline btn-error"
+                    onClick={() => console.log(employee._id)}>
                     Delete
                   </button>
                 </td>
@@ -172,7 +125,7 @@ const EmployeeList = () => {
         nextLabel="next >"
         onPageChange={handlePageClick}
         pageRangeDisplayed={5}
-        pageCount={pageCount}
+        pageCount={apiData?.responseData?.pageCount}
         previousLabel="< previous"
         renderOnZeroPageCount={null}
         containerClassName="pagination flex justify-center mt-4 space-x-2"

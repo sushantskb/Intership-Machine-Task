@@ -124,6 +124,8 @@ const Form = () => {
                 <option>HR</option>
                 <option>Manager</option>
                 <option>Sales</option>
+                <option>Developer</option>
+                <option>Designer</option>
               </select>
             </div>
 

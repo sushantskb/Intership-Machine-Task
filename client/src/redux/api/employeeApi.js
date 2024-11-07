@@ -16,7 +16,17 @@ export const employeeAPI = createApi({
         },
       }),
     }),
+    getAllEmployees: builder.query({
+      query: ({ token, page }) => ({
+        url: `api/v1/employee?page=${page}`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useCreateEmployeeMutation } = employeeAPI;
+export const { useCreateEmployeeMutation, useGetAllEmployeesQuery } =
+  employeeAPI;

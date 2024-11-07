@@ -20,3 +20,17 @@ export const createEmployee = asyncHandler(async (req, res) => {
     res,
   });
 });
+
+export const getAllEmployees = asyncHandler(async (req, res) => {
+  const page = req.query.page;
+  const limit = 4;
+  const skip = (page - 1) * limit;
+  const employees = await Employee.find({}).skip(skip).limit(limit);
+  const pageCount = await Employee.countDocuments({});
+  return message({
+    status: 200,
+    success: true,
+    res,
+    responseData: { employees, pageCount: Math.ceil(pageCount / limit) },
+  });
+});

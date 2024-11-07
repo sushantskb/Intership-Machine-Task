@@ -17,15 +17,19 @@ const Form = () => {
   const id = location.state?.empId;
 
   const [loading, setLoading] = useState(false);
+  const [imgLoading, setImgLoading] = useState(false);
   const { register, handleSubmit, watch, setValue } = useForm();
   const file = watch("profileImg");
-  const [imageUrl, setImageUrl] = useState(null);
   const { token } = useSelector((state) => state.userReducer);
 
   //api
   const [createEmployee] = useCreateEmployeeMutation();
   const { data: formData, refetch } = useGetEmployeeByIdQuery({ token, id });
   const [editEmployee] = useEditEmployeeMutation();
+
+  const [imageUrl, setImageUrl] = useState(
+    formData?.responseData?.profileImg || null
+  );
 
   useEffect(() => {
     if (id) {
@@ -52,7 +56,7 @@ const Form = () => {
   }, [formData, setValue]);
 
   const imageChange = async (selectedFile) => {
-    setLoading(true);
+    setImgLoading(true);
     try {
       const formData = new FormData();
       formData.append("file", selectedFile);
@@ -67,18 +71,16 @@ const Form = () => {
 
       const uploadedImageUrl = response.data.secure_url;
       setImageUrl(uploadedImageUrl);
-      console.log("Uploaded image URL:", imageUrl);
     } catch (error) {
       console.error("Image Upload failed:", error);
     } finally {
-      setLoading(false);
+      setImgLoading(false);
     }
   };
 
   const submitHandler = async (data) => {
     const params = { ...data, profileImg: imageUrl };
     setLoading(true);
-    console.log("params", params);
 
     try {
       if (id) {
@@ -249,7 +251,7 @@ const Form = () => {
               />
             </div>
 
-            {loading && (
+            {imgLoading && (
               <div className="">
                 <AiOutlineLoading className="animate-spin text-2xl text-primary" />{" "}
                 Uploading...
@@ -270,7 +272,7 @@ const Form = () => {
               <button
                 type="submit"
                 className="btn btn-success w-full md:w-[50%] text-white"
-                disabled={loading}>
+                disabled={loading || imgLoading}>
                 {formData ? "Edit" : "Submit"}
               </button>
             </div>

@@ -1,8 +1,8 @@
 import { useSelector } from "react-redux";
 
 export const CheckToken = () => {
-  const { user } = useSelector((state) => state.testReducer);
-  if (user) {
+  const { token } = useSelector((state) => state.userReducer);
+  if (token) {
     return true;
   } else {
     return false;

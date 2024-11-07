@@ -9,7 +9,7 @@ import {
 import { formatDate } from "../../utils/dateFormater"; // My custom date formatter
 import toast from "react-hot-toast";
 import Header2 from "../components/common/Header2";
-
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 const EmployeeList = () => {
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.userReducer);
@@ -17,8 +17,11 @@ const EmployeeList = () => {
   const [searchKeyword, setSearchKeyword] = useState("");
 
   // Fetch all employees data with the token
-  const { data: apiData, refetch } = useGetAllEmployeesQuery({ token, page });
-  
+  const {
+    data: apiData,
+    refetch,
+    isLoading,
+  } = useGetAllEmployeesQuery({ token, page });
 
   const [deleteEmployee] = useDeleteEmployeeMutation();
 
@@ -92,51 +95,63 @@ const EmployeeList = () => {
                 <th className="p-3 text-left border border-gray-300">ID</th>
                 <th className="p-3 text-left border border-gray-300">Name</th>
                 <th className="p-3 text-left border border-gray-300">Email</th>
-                <th className="p-3 text-left border border-gray-300">Mobile No</th>
-                <th className="p-3 text-left border border-gray-300">Designation</th>
+                <th className="p-3 text-left border border-gray-300">
+                  Mobile No
+                </th>
+                <th className="p-3 text-left border border-gray-300">
+                  Designation
+                </th>
                 <th className="p-3 text-left border border-gray-300">Gender</th>
                 <th className="p-3 text-left border border-gray-300">Course</th>
                 <th className="p-3 text-left border border-gray-300">Date</th>
-                <th className="p-3 text-center border border-gray-300">Actions</th>
+                <th className="p-3 text-center border border-gray-300">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
-              {filteredEmployees?.map((employee) => (
-                <tr
-                  key={employee.id}
-                  className="text-center border border-gray-300">
-                  <td className="p-3 text-left">{employee.id}</td>
-                  <td className="p-3 text-left">{employee.name}</td>
-                  <td className="p-3 text-left text-blue-600">
-                    <a href={`mailto:${employee.email}`}>{employee.email}</a>
-                  </td>
-                  <td className="p-3 text-left">{employee.phone}</td>
-                  <td className="p-3 text-left">{employee.designation}</td>
-                  <td className="p-3 text-left">{employee.gender}</td>
-                  <td className="p-3 text-left">
-                    {employee?.course?.join(", ")}
-                  </td>
-                  <td className="p-3 text-left">
-                    {formatDate(employee.createdAt?.split("T")[0])}
-                  </td>
-                  <td className="p-3 text-center space-x-2">
-                    <button
-                      className="btn btn-xs btn-outline btn-info"
-                      onClick={() =>
-                        navigate("/create-employee", {
-                          state: { empId: employee._id },
-                        })
-                      }>
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-xs btn-outline btn-error"
-                      onClick={() => handleDelete(employee._id)}>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <AiOutlineLoading3Quarters className="animate-spin" />
+                </div>
+              ) : (
+                filteredEmployees?.map((employee) => (
+                  <tr
+                    key={employee.id}
+                    className="text-center border border-gray-300">
+                    <td className="p-3 text-left">{employee.id}</td>
+                    <td className="p-3 text-left">{employee.name}</td>
+                    <td className="p-3 text-left text-blue-600">
+                      <a href={`mailto:${employee.email}`}>{employee.email}</a>
+                    </td>
+                    <td className="p-3 text-left">{employee.phone}</td>
+                    <td className="p-3 text-left">{employee.designation}</td>
+                    <td className="p-3 text-left">{employee.gender}</td>
+                    <td className="p-3 text-left">
+                      {employee?.course?.join(", ")}
+                    </td>
+                    <td className="p-3 text-left">
+                      {formatDate(employee.createdAt?.split("T")[0])}
+                    </td>
+                    <td className="p-3 text-center space-x-2">
+                      <button
+                        className="btn btn-xs btn-outline btn-info"
+                        onClick={() =>
+                          navigate("/create-employee", {
+                            state: { empId: employee._id },
+                          })
+                        }>
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-xs btn-outline btn-error"
+                        onClick={() => handleDelete(employee._id)}>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

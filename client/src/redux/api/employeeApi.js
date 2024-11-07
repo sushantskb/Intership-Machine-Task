@@ -25,8 +25,21 @@ export const employeeAPI = createApi({
         },
       }),
     }),
+    deleteEmployee: builder.mutation({
+      query: ({ token, empId }) => ({
+        url: "/api/v1/employee/delete",
+        method: "POST",
+        body: { empId },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useCreateEmployeeMutation, useGetAllEmployeesQuery } =
-  employeeAPI;
+export const {
+  useCreateEmployeeMutation,
+  useGetAllEmployeesQuery,
+  useDeleteEmployeeMutation,
+} = employeeAPI;

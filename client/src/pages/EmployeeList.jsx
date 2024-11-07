@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useGetAllEmployeesQuery } from "../redux/api/employeeApi";
+import {
+  useDeleteEmployeeMutation,
+  useGetAllEmployeesQuery,
+} from "../redux/api/employeeApi";
 import { formatDate } from "../../utils/dateFormater"; //my custom date formatter
-
+import toast from "react-hot-toast";
 const EmployeeList = () => {
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.userReducer);
@@ -13,6 +16,7 @@ const EmployeeList = () => {
 
   // Fetch all employees data with the token
   const { data: apiData, refetch } = useGetAllEmployeesQuery({ token, page });
+  const [deleteEmployee] = useDeleteEmployeeMutation();
 
   useEffect(() => {
     refetch();
@@ -26,7 +30,7 @@ const EmployeeList = () => {
     setSearchKeyword(e.target.value);
   };
 
-  const filteredEmployess = apiData.responseData?.employees.filter(
+  const filteredEmployess = apiData?.responseData?.employees?.filter(
     (employee) => {
       return (
         employee.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
@@ -35,6 +39,21 @@ const EmployeeList = () => {
       );
     }
   );
+
+  const handleDelete = async (empId) => {
+    try {
+      const { data, error } = await deleteEmployee({ token, empId });
+      if (error) {
+        toast.error(error.data.message);
+      }
+      if (data) {
+        toast.success(data.message);
+        refetch();
+      }
+    } catch (error) {
+      console.log("Error", error);
+    }
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -83,7 +102,7 @@ const EmployeeList = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredEmployess.map((employee) => (
+            {filteredEmployess?.map((employee) => (
               <tr
                 key={employee.id}
                 className="text-center border border-gray-300">
@@ -109,7 +128,7 @@ const EmployeeList = () => {
                   </button>
                   <button
                     className="btn btn-xs btn-outline btn-error"
-                    onClick={() => console.log(employee._id)}>
+                    onClick={() => handleDelete(employee._id)}>
                     Delete
                   </button>
                 </td>

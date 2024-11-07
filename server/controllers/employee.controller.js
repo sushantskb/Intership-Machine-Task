@@ -34,3 +34,26 @@ export const getAllEmployees = asyncHandler(async (req, res) => {
     responseData: { employees, pageCount: Math.ceil(pageCount / limit) },
   });
 });
+
+export const deleteEmployee = asyncHandler(async (req, res) => {
+  const empId = req.body.empId;
+  console.log("EmpId", empId);
+
+  const employee = await Employee.findById(empId);
+  if (!empId) {
+    return message({
+      status: 404,
+      success: false,
+      message: "Invlaid Id or Employee Not Found",
+      res,
+    });
+  }
+  await Employee.findByIdAndDelete(empId);
+
+  return message({
+    status: 200,
+    success: true,
+    message: "Deleted",
+    res,
+  });
+});

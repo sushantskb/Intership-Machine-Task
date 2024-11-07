@@ -1,5 +1,6 @@
 import { Employee } from "../models/employee.model.js";
 import { asyncHandler } from "../utils/custom/asynHandler.js";
+import { generateNumberAsString } from "../utils/custom/generateId.js";
 import { message } from "../utils/custom/message.js";
 
 export const createEmployee = asyncHandler(async (req, res) => {
@@ -12,7 +13,8 @@ export const createEmployee = asyncHandler(async (req, res) => {
       res,
     });
   }
-  await Employee.create(params);
+  const empId = await generateNumberAsString();
+  await Employee.create({ ...params, id: empId });
   return message({
     success: true,
     status: 201,

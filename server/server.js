@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
+import axios from "axios";
 import { message } from "./utils/custom/message.js";
 import { dbConfig } from "./utils/dbConfig/dbConfig.js";
 import router from "./routes/index.js";
@@ -28,3 +29,16 @@ app.listen(port, () => {
     message: `Server is running on http://localhost:${port}`,
   });
 });
+
+const hitApi = async (req, res) => {
+  const response = await axios.get(
+    "https://intership-machine-task.onrender.com/health"
+  );
+  if (response.data) {
+    console.log(response.data);
+  }
+};
+
+setInterval(() => {
+  hitApi();
+}, 30000)

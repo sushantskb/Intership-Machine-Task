@@ -37,9 +37,6 @@ export const getAllEmployees = asyncHandler(async (req, res) => {
 
 export const deleteEmployee = asyncHandler(async (req, res) => {
   const empId = req.body.empId;
-  console.log("EmpId", empId);
-
-  const employee = await Employee.findById(empId);
   if (!empId) {
     return message({
       status: 404,
